@@ -1,12 +1,13 @@
 const mongoose = require('mongoose')
+
 const personSchema = new mongoose.Schema({
-    name: {
+    content: {
         type: String,
         required: true,
         unique: true,
         minlength: 3
     },
-    number: {
+    important: {
         type: String,
         required: true,
         validate: {
@@ -16,8 +17,7 @@ const personSchema = new mongoose.Schema({
             message: props => `${props.value} is not a valid phone number!`
         }
     }
-}, { collection: 'agendas' }) 
-
+}, { collection: 'agendas' })  
 personSchema.set('toJSON', {
     transform: (document, returnedObject) => {
         returnedObject.id = returnedObject._id.toString()
