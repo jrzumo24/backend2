@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-
 const personSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -17,7 +16,7 @@ const personSchema = new mongoose.Schema({
             message: props => `${props.value} is not a valid phone number!`
         }
     }
-})
+}, { collection: 'agendas' }) 
 
 personSchema.set('toJSON', {
     transform: (document, returnedObject) => {

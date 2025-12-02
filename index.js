@@ -25,7 +25,9 @@ mongoose.connect(url)
     console.log('Error connecting to MongoDB', error.message)
    })
 
+// Importar el modelo desde la carpeta models
 const Person = require('./models/person')
+
 app.get('/api/persons', (request, response, next) => {
     Person.find({})
         .then(persons => {
