@@ -1,8 +1,8 @@
-require('dotenv').config()  
+require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
-const mongoose = require('mongoose')  
+const mongoose = require('mongoose')
 const app = express()
 
 app.use(express.json())
@@ -26,10 +26,23 @@ mongoose.connect(url)
    })
 
 const Person = require('./models/person')
+
+const transformToApi = (person) => ({
+    id: person.id,
+    name: person.content,    
+    number: person.important 
+})
+
+const transformToMongo = (apiData) => ({
+    content: apiData.name,    
+    important: apiData.number 
+})
+
 app.get('/api/persons', (request, response, next) => {
     Person.find({})
         .then(persons => {
-            response.json(persons)
+            const transformed = persons.map(transformToApi)
+            response.json(transformed)
         })
         .catch(error => next(error))
 })
@@ -50,7 +63,7 @@ app.get('/api/persons/:id', (request, response, next) => {
     Person.findById(request.params.id)
         .then(person => {
             if (person) {
-                response.json(person)
+                response.json(transformToApi(person))
             } else {
                 response.status(404).json({ error: 'person not found' })
             }
@@ -77,21 +90,19 @@ app.post('/api/persons', (request, response, next) => {
         return response.status(400).json({ error: 'number is missing' })
     }
 
-    Person.findOne({ name: body.name })
+    Person.findOne({ content: body.name })
         .then(existingPerson => {
             if (existingPerson) {
                 return response.status(400).json({ error: 'name must be unique' })
             }
 
-            const person = new Person({
-                name: body.name,
-                number: body.number
-            })
+            const mongoData = transformToMongo(body)
+            const person = new Person(mongoData)
 
             return person.save()
         })
         .then(savedPerson => {
-            response.json(savedPerson)
+            response.json(transformToApi(savedPerson))
         })
         .catch(error => next(error))
 })
@@ -99,19 +110,20 @@ app.post('/api/persons', (request, response, next) => {
 app.put('/api/persons/:id', (request, response, next) => {
     const body = request.body
 
-    const person = {
-        name: body.name,
-        number: body.number
+    if (!body.name || !body.number) {
+        return response.status(400).json({ error: 'name or number missing' })
     }
+
+    const mongoData = transformToMongo(body)
 
     Person.findByIdAndUpdate(
         request.params.id, 
-        person, 
+        mongoData, 
         { new: true, runValidators: true, context: 'query' }
     )
         .then(updatedPerson => {
             if (updatedPerson) {
-                response.json(updatedPerson)
+                response.json(transformToApi(updatedPerson))
             } else {
                 response.status(404).json({ error: 'person not found' })
             }
@@ -131,6 +143,8 @@ const errorHandler = (error, request, response, next) => {
         return response.status(400).send({ error: 'malformatted id' })
     } else if (error.name === 'ValidationError') {
         return response.status(400).json({ error: error.message })
+    } else if (error.code === 11000) { 
+        return response.status(400).json({ error: 'name must be unique' })
     }
 
     next(error)
