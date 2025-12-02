@@ -9,15 +9,11 @@ const personSchema = new mongoose.Schema({
     },
     important: {
         type: String,
-        required: true,
-        validate: {
-            validator: function(v) {
-                return /^\d{2,3}-\d{6,}$/.test(v) || /^\d{8,}$/.test(v)
-            },
-            message: props => `${props.value} is not a valid phone number!`
-        }
+        required: true
+        
     }
-}, { collection: 'agendas' })  
+}, { collection: 'agendas' })
+
 personSchema.set('toJSON', {
     transform: (document, returnedObject) => {
         returnedObject.id = returnedObject._id.toString()
