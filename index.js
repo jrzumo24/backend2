@@ -13,7 +13,7 @@ morgan.token('body', (req) => {
 })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
-// Variables de entorno (Render las inyecta)
+// Variables de entorno
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://JRZM:Pistache24@cluster0.ahgqfzb.mongodb.net/appAgenda'
 const PORT = process.env.PORT || 3001
 
@@ -24,12 +24,13 @@ mongoose.set('strictQuery', false)
 console.log('Connecting to MongoDB...')
 mongoose.connect(MONGODB_URI)
    .then(() => {
-    console.log('Connected to MongoDB')
+    console.log('✅ Connected to MongoDB')
    })
    .catch(error => {
-    console.log('Error connecting to MongoDB:', error.message)
+    console.log('❌ Error connecting to MongoDB:', error.message)
    })
 
+// Importar el modelo
 const Person = require('./models/person')
 
 // Funciones de transformación (API ↔ MongoDB)
@@ -92,7 +93,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
 // POST new person
 app.post('/api/persons', (request, response, next) => {
     const body = request.body
-    console.log('POST request body:', body)
+    console.log('📝 POST request body:', body)
 
     if (!body.name) {
         return response.status(400).json({ error: 'name is missing' })
@@ -113,7 +114,7 @@ app.post('/api/persons', (request, response, next) => {
             return person.save()
         })
         .then(savedPerson => {
-            console.log('Person saved:', savedPerson)
+            console.log('✅ Person saved:', savedPerson)
             response.json(toApiResponse(savedPerson))
         })
         .catch(error => next(error))
@@ -122,6 +123,7 @@ app.post('/api/persons', (request, response, next) => {
 // PUT update person
 app.put('/api/persons/:id', (request, response, next) => {
     const body = request.body
+    console.log('🔄 PUT request:', { id: request.params.id, body })
 
     if (!body.name || !body.number) {
         return response.status(400).json({ error: 'name and number are required' })
@@ -134,22 +136,25 @@ app.put('/api/persons/:id', (request, response, next) => {
     )
         .then(updatedPerson => {
             if (updatedPerson) {
+                console.log('✅ Person updated:', updatedPerson)
                 response.json(toApiResponse(updatedPerson))
             } else {
+                console.log('❌ Person not found for update')
                 response.status(404).json({ error: 'person not found' })
             }
         })
         .catch(error => next(error))
 })
 
-// Error handlers
+// Manejo de rutas no encontradas
 const unknownEndpoint = (request, response) => {
     response.status(404).send({ error: 'unknown endpoint' })
 }
 app.use(unknownEndpoint)
 
+// Manejo de errores
 const errorHandler = (error, request, response, next) => {
-    console.error('ERROR:', error.message)
+    console.error('💥 ERROR:', error.message)
 
     if (error.name === 'CastError') {
         return response.status(400).send({ error: 'malformatted id' })
@@ -163,6 +168,7 @@ const errorHandler = (error, request, response, next) => {
 }
 app.use(errorHandler)
 
+// Iniciar servidor
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
+    console.log(`🚀 Server running on port ${PORT}`)
 })

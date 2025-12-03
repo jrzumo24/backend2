@@ -10,7 +10,6 @@ const personSchema = new mongoose.Schema({
     important: {
         type: String,
         required: true
-        
     }
 }, { collection: 'agendas' })
 
