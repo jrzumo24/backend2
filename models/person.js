@@ -1,32 +1,25 @@
 const mongoose = require('mongoose')
 
-// ESQUEMA CORREGIDO
 const personSchema = new mongoose.Schema({
-  content: {
-    type: String,
-    required: true,
-    unique: true,
-    minlength: 3
-  },
-  important: {
-    type: String,
-    required: true
-  }
-})
+    content: {
+        type: String,
+        required: true,
+        unique: true,
+        minlength: 3
+    },
+    important: {
+        type: String,
+        required: true
+        
+    }
+}, { collection: 'agendas' })
 
-// TRANSFORMACIÓN A JSON
 personSchema.set('toJSON', {
-  transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString()
-    returnedObject.name = returnedObject.content      // content → name
-    returnedObject.number = returnedObject.important  // important → number
-
-    delete returnedObject._id
-    delete returnedObject.__v
-    delete returnedObject.content
-    delete returnedObject.important
-  }
+    transform: (document, returnedObject) => {
+        returnedObject.id = returnedObject._id.toString()
+        delete returnedObject._id
+        delete returnedObject.__v
+    }
 })
 
-// EXPORTAR MODELO (sin colección forzada)
 module.exports = mongoose.model('Person', personSchema)
