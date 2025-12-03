@@ -13,8 +13,8 @@ morgan.token('body', (req) => {
 })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
-// Variables de entorno
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://JRZM:Pistache24@cluster0.ahgqfzb.mongodb.net/appAgenda'
+// Variables directas de process.env (Render las inyecta automáticamente)
+const MONGODB_URI = process.env.MONGODB_URI
 const PORT = process.env.PORT || 3001
 
 console.log('Port:', PORT)
@@ -30,7 +30,7 @@ mongoose.connect(MONGODB_URI)
     console.log('❌ Error connecting to MongoDB:', error.message)
    })
 
-// Importar el modelo
+// Importar el modelo DESDE models/person.js
 const Person = require('./models/person')
 
 // Funciones de transformación (API ↔ MongoDB)
