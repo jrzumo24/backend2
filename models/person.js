@@ -1,5 +1,7 @@
 const mongoose = require('mongoose')
 
+//actualizacion 10
+
 const personSchema = new mongoose.Schema({
     content: {
         type: String,
