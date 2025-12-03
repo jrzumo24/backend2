@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-//actualizacion 10
+//actualizacion 11
 
 const personSchema = new mongoose.Schema({
     content: {
