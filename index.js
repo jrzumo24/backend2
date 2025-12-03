@@ -24,10 +24,10 @@ mongoose.set('strictQuery', false)
 console.log('Connecting to MongoDB...')
 mongoose.connect(MONGODB_URI)
    .then(() => {
-    console.log('✅ Connected to MongoDB')
+    console.log('Connected to MongoDB')
    })
    .catch(error => {
-    console.log('❌ Error connecting to MongoDB:', error.message)
+    console.log('Error connecting to MongoDB:', error.message)
    })
 
 const Person = require('./models/person')
